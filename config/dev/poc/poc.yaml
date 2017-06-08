@@ -1,0 +1,12 @@
+---
+template_path: templates/poc.yaml
+parameters:
+  InstanceType: t2.medium
+  AmiId:
+  PemKey:
+  Subnet:
+  Userdata:
+
+
+sceptre_user_data:
+

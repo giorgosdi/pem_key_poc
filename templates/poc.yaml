@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  InstanceType:
+    Type: String
+  AmiId:
+    Type: String
+  PemKey:
+    Type: String
+  Subnet:
+    Type: String
+  Userdata:
+    Type:
+
+Resources:
+  myInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref AmiId
+      KeyName: !Ref PemKey
+      SubnetId: !Ref Subnet
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -v
+          mkdir -p /storage/
+          # Format and mount the additional volume
+          mkfs -t ext4 /dev/xvdb &>> /storage/installation_log.txt
+          mount /dev/xvdb /storage &>> /storage/installation_log.txt
+          mkdir -p /storage/jenkins/
+
+          # Add repos
+          add-apt-repository ppa:openjdk-r/ppa -y &>> /storage/installation_log.txt
+          wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
+          echo 'deb https://pkg.jenkins.io/debian-stable binary/' | tee -a /etc/apt/sources.list
+
+          # Install prerequisites
+          apt-get update &>> /storage/installation_log.txt
+          apt-get install python-software-properties -y &>> /storage/installation_log.txt
+          apt-get install openjdk-7-jdk -y &>> /storage/installation_log.txt
+          apt-get install jenkins -y &>> /storage/installation_log.txt
+          apt-get install python-pip python-dev build-essential -y &>> /storage/installation_log.txt
+          pip install awscli &>> /storage/installation_log.txt
+
+          # Configure Jenkins
+          mv /var/lib/jenkins/* /storage/jenkins/ &>> /storage/installation_log.txt
+          mv /etc/default/jenkins /etc/default/.jenkins.old &>> /storage/installation_log.txt
+          aws s3 cp s3://hermes-sharedservices-data/Jenkins/jenkins /etc/default/jenkins &>> /storage/installation_log.txt
+          chown -R jenkins:jenkins /storage/jenkins/ &>> /storage/installation_log.txt
+          chown -R jenkins:jenkins /var/cache/jenkins/ &>> /storage/installation_log.txt
+          chmod 700 /storage/jenkins/ &>> /storage/installation_log.txt
+
+          aws s3 cp s3://hermes-sharedservices-data/Jenkins/jenkins_backup /storage
+          crontab /storage/jenkins_backup
+          rm /storage/jenkins_backup
+
+          mv /etc/fstab /etc/fstab.old
+          aws s3 cp s3://hermes-sharedservices-data/Services/fstab_services /etc/fstab &>> /storage/installation_log.txt
+
+          service jenkins start &>> /storage/installation_log.txt
+          service jenkins restart &>> /storage/installation_log.txt
+
+
+
