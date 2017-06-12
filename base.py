@@ -152,7 +152,7 @@ class CloudformationAbstractBaseClass:
         name_parts.extend(name_joins)
         return Join("-", name_parts)
 
-    def get_subnet_param(self, subnet):
+    def get_subnet_param(self, subnet, single=False):
 
         if subnet[:7] == 'subnet-':
             return subnet
@@ -161,14 +161,23 @@ class CloudformationAbstractBaseClass:
              return subnet
         elif subnet[:7] != 'subnet-':
             if subnet not in self.template.parameters.keys():
-
-                self.template.add_parameter(
-                    Parameter(
-                        subnet,
-                        Type='List<String>',
-                        Description='Subnet ID for {}'.format(subnet)
+                if single:
+                    self.template.add_parameter(
+                        Parameter(
+                            subnet,
+                            Type='String',
+                            Description='Subnet ID for {}'.format(subnet)
+                        )
                     )
-                )
+                else:
+
+                    self.template.add_parameter(
+                        Parameter(
+                            subnet,
+                            Type='List<String>',
+                            Description='Subnet ID for {}'.format(subnet)
+                        )
+                    )
 
             return Ref(subnet)
 
