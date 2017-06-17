@@ -1,4 +1,0 @@
----
-template_path: templates/generate_config.py
-parameters:
-  cidr: 12.0.0.0/16

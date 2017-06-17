@@ -1,13 +1,62 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-# Parameters:
-#   cidr:
-#     Type: String
+Parameters:
+  cidr:
+    Type: String
+  subnet_az:
+    Type: String
+  subnet_cidr:
+    Type: String
 
 Resources:
   myVPC:
     Type: "AWS::EC2::VPC"
     Properties:
       CidrBlock: {{ config['parameters']['cidr'] }}
+      Tags:
+      {% for tag in config.tags %}
+      - Key: {{ tag }}
+        Value: {{ config.tags[tag] }}
+      {% endfor %}
+
+
+  mySubnet:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Ref subnet_az
+      CidrBlock: !Ref subnet_cidr
+      MapPublicIpOnLaunch: true
+      Tags:
+      {% for tag in config.tags %}
+      - Key: {{ tag }}
+        Value: {{ config.tags[tag] }}
+      {% endfor %}
+      VpcId: !Ref myVPC
+
+  myRouteTable:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId: !Ref myVPC
+      Tags:
+      {% for tag in config.tags %}
+      - Key: {{ tag }}
+        Value: {{ config.tags[tag] }}
+      {% endfor %}
+
+  myRoute:
+    Type: "AWS::EC2::Route"
+    Properties:
+      DestinationCidrBlock: String
+      DestinationIpv6CidrBlock: String
+      GatewayId: String
+      InstanceId: String
+      NatGatewayId: String
+      NetworkInterfaceId: String
+      RouteTableId: String
+      VpcPeeringConnectionId: String
+Outputs:
+  VpcId:
+    Description: The VPC Id
+    Value: !Ref myVPC
 
 

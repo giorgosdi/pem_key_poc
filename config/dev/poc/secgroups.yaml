@@ -1,0 +1,43 @@
+---
+template_path: templates/jinja/generate_sec_group.py
+parameters:
+
+
+  VpcId: vpc-b772bad0
+  SecGroupName: poc-sec-group
+  SecGroupDescription: Test security group for PoC
+
+
+sceptre_user_data:
+  tags:
+    Name: Giorgos' PoC sec group
+    Owner: giorgos.dimitriou
+  sec_group:
+    ingress:
+      - tcp 169.254.20.146/30 80
+      - tcp 169.254.22.74/32 80
+      - tcp 169.254.22.73/30 80
+      - tcp 34.248.181.230/30 80
+      - tcp 87.102.61.34/30 80
+      - tcp 10.0.0.0/8 80
+      - tcp 5.148.19.35/32 80
+      - tcp 156.67.242.53/32 80
+      - tcp 194.73.135.218/32 80
+      - tcp 87.102.61.34/32 80
+      - tcp 169.254.22.74/32 22
+      - tcp 169.254.20.146/30 22
+      - tcp 169.254.22.74/32 22
+      - tcp 169.254.22.73/30 22
+      - tcp 34.248.181.230/30 22
+      - tcp 87.102.61.34/30 22
+      - tcp 10.0.0.0/8 22
+      - tcp 5.148.19.35/32 22
+      - tcp 156.67.242.53/32 22
+      - tcp 194.73.135.218/32 22
+      - tcp 87.102.61.34/32 22
+      - tcp 176.34.130.192/32 22
+      - icmp 169.254.22.74/32 -1
+      - icmp 169.254.22.73/30 -1
+      - icmp 34.248.181.230/30 -1
+      - icmp 87.102.61.34/30 -1
+

@@ -2,11 +2,13 @@
 template_path: templates/poc.yaml
 parameters:
   InstanceType: t2.medium
-  AmiId:
-  PemKey:
+  AmiId: ami-a8d2d7ce
+  PemKey: giorgos-lab
   Subnet:
   Userdata:
 
 
 sceptre_user_data:
-
+  tags:
+    Name: Giorgos' PoC sec group
+    Owner: giorgos.dimitriou

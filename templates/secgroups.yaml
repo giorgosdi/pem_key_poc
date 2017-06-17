@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  VpcId:
+    Type: String
+  SecGroupName:
+    Type: String
+  SecGroupDescription:
+    Type: String
+
+Resources:
+  mySecGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName: !Ref SecGroupName
+      GroupDescription: !Ref SecGroupDescription
+      SecurityGroupIngress:
+        {% for rule in config.rules %}
+        - IpProtocol: {{config.rules[rule].protocol}}
+          FromPort: {{config.rules[rule].from}}
+          ToPort: {{config.rules[rule].to}}
+          CidrIp: {{config.rules[rule].ip}}
+        {% endfor %}
+      Tags:
+      {% for tag in config.tags %}
+      - Key: {{ tag }}
+        Value: {{ config.tags[tag] }}
+      {% endfor %}
+      VpcId: !Ref VpcId
+
+Outputs:
+  SecGroupId:
+    Description: Security Group ID
+    Value: !Ref mySecGroup

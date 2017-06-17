@@ -24,9 +24,6 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -v
           mkdir -p /storage/
-          # Format and mount the additional volume
-          mkfs -t ext4 /dev/xvdb &>> /storage/installation_log.txt
-          mount /dev/xvdb /storage &>> /storage/installation_log.txt
           mkdir -p /storage/jenkins/
 
           # Add repos
@@ -53,9 +50,6 @@ Resources:
           aws s3 cp s3://hermes-sharedservices-data/Jenkins/jenkins_backup /storage
           crontab /storage/jenkins_backup
           rm /storage/jenkins_backup
-
-          mv /etc/fstab /etc/fstab.old
-          aws s3 cp s3://hermes-sharedservices-data/Services/fstab_services /etc/fstab &>> /storage/installation_log.txt
 
           service jenkins start &>> /storage/installation_log.txt
           service jenkins restart &>> /storage/installation_log.txt

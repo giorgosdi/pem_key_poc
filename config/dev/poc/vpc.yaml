@@ -1,4 +1,8 @@
 ---
-template_path: templates/generate_config.py
+template_path: templates/jinja/generate_vpc.py
 parameters:
   cidr: 12.0.0.0/16
+sceptre_user_data:
+  tags:
+    Name: Giorgos' PoC VPC setup
+    Owner: giorgos.dimitriou
