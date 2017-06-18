@@ -3,35 +3,32 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   cidr:
     Type: String
-  subnet_az:
+  {% for az in range(1,4) %}
+  subnetCidr{{ loop.index }}:
     Type: String
-  subnet_cidr:
+  {% endfor %}
+  internetRoute:
     Type: String
 
 Resources:
   myVPC:
     Type: "AWS::EC2::VPC"
     Properties:
-      CidrBlock: {{ config['parameters']['cidr'] }}
+      CidrBlock: !Ref cidr
+      Tags:
+      {% for tag in config['tags'] %}
+      - Key: {{ tag }}
+        Value: {{ config['tags'][tag] }}
+      {% endfor %}
+
+  myInternetGateaway:
+    Type: "AWS::EC2::InternetGateway"
+    Properties: 
       Tags:
       {% for tag in config.tags %}
       - Key: {{ tag }}
         Value: {{ config.tags[tag] }}
       {% endfor %}
-
-
-  mySubnet:
-    Type: "AWS::EC2::Subnet"
-    Properties:
-      AvailabilityZone: !Ref subnet_az
-      CidrBlock: !Ref subnet_cidr
-      MapPublicIpOnLaunch: true
-      Tags:
-      {% for tag in config.tags %}
-      - Key: {{ tag }}
-        Value: {{ config.tags[tag] }}
-      {% endfor %}
-      VpcId: !Ref myVPC
 
   myRouteTable:
     Type: "AWS::EC2::RouteTable"
@@ -43,20 +40,59 @@ Resources:
         Value: {{ config.tags[tag] }}
       {% endfor %}
 
+  myGWAttachment:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      InternetGatewayId: !Ref myInternetGateaway
+      VpcId: !Ref myVPC
+
+  {% for az in range(1,4) %}
+  mySubnet{{ loop.index }}:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      CidrBlock: !Ref subnetCidr{{ loop.index }}
+      MapPublicIpOnLaunch: true
+      Tags:
+      {% for tag in config.tags %}
+      - Key: {{ tag }}
+        Value: {{ config.tags[tag] }}
+      {% endfor %}
+      VpcId: !Ref myVPC
+  {% endfor %}
+
+
   myRoute:
     Type: "AWS::EC2::Route"
     Properties:
-      DestinationCidrBlock: String
-      DestinationIpv6CidrBlock: String
-      GatewayId: String
-      InstanceId: String
-      NatGatewayId: String
-      NetworkInterfaceId: String
-      RouteTableId: String
-      VpcPeeringConnectionId: String
+      DestinationCidrBlock: !Ref internetRoute
+      GatewayId: !Ref myInternetGateaway
+      RouteTableId: !Ref myRouteTable
+
+  {% for i in range(1,4) %}
+  mySubnetRouteAssoc:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      RouteTableId: !Ref myRoute
+      SubnetId: !Ref mySubnet{{loop.index}}
+  {% endfor %}
+
+
+
 Outputs:
   VpcId:
     Description: The VPC Id
     Value: !Ref myVPC
+  
+  {% for i in range(1,4) %}
+  SubnetId{{loop.index}}:
+    Description: The subnet id
+    Value: !Ref mySubnet{{loop.index}}
+  {% endfor %}
+  
+  RouteTableId:
+    Description: The route table Id
+    Value: !Ref myRouteTable
 
-
+  IGWid:
+    Description: The IGW Id
+    Value: !Ref myInternetGateaway

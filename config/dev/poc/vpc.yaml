@@ -2,6 +2,10 @@
 template_path: templates/jinja/generate_vpc.py
 parameters:
   cidr: 12.0.0.0/16
+  subnetCidr1: 12.0.1.0/24
+  subnetCidr2: 12.0.2.0/24
+  subnetCidr3: 12.0.3.0/24
+  internetRoute: 0.0.0.0/0
 sceptre_user_data:
   tags:
     Name: Giorgos' PoC VPC setup

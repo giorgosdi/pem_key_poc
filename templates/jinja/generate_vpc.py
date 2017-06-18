@@ -18,9 +18,10 @@ class PocTemplate():
         content = yaml.load(config)
 
 
+    new_dict = content['sceptre_user_data']
     def print_temp(self):
         template = self.ENV.get_template("templates/vpc.yaml")
-        return template.render(config=self.content)
+        return template.render(config=self.new_dict)
 
 
 

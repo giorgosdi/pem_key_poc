@@ -3,7 +3,8 @@ template_path: templates/jinja/generate_sec_group.py
 parameters:
 
 
-  VpcId: vpc-b772bad0
+  VpcId: !stack_output dev/poc/vpc::VpcId
+  #vpc-8da67dea
   SecGroupName: poc-sec-group
   SecGroupDescription: Test security group for PoC
 
