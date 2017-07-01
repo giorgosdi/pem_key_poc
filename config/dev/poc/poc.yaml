@@ -1,11 +1,9 @@
----
-template_path: templates/poc.yaml
+template_path: templates/jinja/generate_instance.py
 parameters:
   InstanceType: t2.medium
   AmiId: ami-a8d2d7ce
   PemKey: giorgos-lab
-  Subnet:
-  Userdata: 
+  Subnet: subnet-adec48e4
 
 sceptre_user_data:
   tags:

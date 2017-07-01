@@ -3,7 +3,7 @@ template_path: templates/jinja/generate_sec_group.py
 parameters:
 
 
-  VpcId: !stack_output dev/poc/vpc::VpcId
+  VpcId: vpc-8da67dea
   #vpc-8da67dea
   SecGroupName: poc-sec-group
   SecGroupDescription: Test security group for PoC
@@ -15,6 +15,7 @@ sceptre_user_data:
     Owner: giorgos.dimitriou
   sec_group:
     ingress:
+      - tcp 176.34.130.192/32 80
       - tcp 169.254.20.146/30 80
       - tcp 169.254.22.74/32 80
       - tcp 169.254.22.73/30 80

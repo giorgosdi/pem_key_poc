@@ -26,36 +26,13 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -v
-          mkdir -p /storage/
-          mkdir -p /storage/jenkins/
 
-          # Add repos
-          add-apt-repository ppa:openjdk-r/ppa -y &>> /storage/installation_log.txt
-          wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
-          echo 'deb https://pkg.jenkins.io/debian-stable binary/' | tee -a /etc/apt/sources.list
-
-          # Install prerequisites
-          apt-get update &>> /storage/installation_log.txt
-          apt-get install python-software-properties -y &>> /storage/installation_log.txt
-          apt-get install openjdk-7-jdk -y &>> /storage/installation_log.txt
-          apt-get install jenkins -y &>> /storage/installation_log.txt
-          apt-get install python-pip python-dev build-essential -y &>> /storage/installation_log.txt
-          pip install awscli &>> /storage/installation_log.txt
-
-          # Configure Jenkins
-          mv /var/lib/jenkins/* /storage/jenkins/ &>> /storage/installation_log.txt
-          mv /etc/default/jenkins /etc/default/.jenkins.old &>> /storage/installation_log.txt
-          aws s3 cp s3://hermes-sharedservices-data/Jenkins/jenkins /etc/default/jenkins &>> /storage/installation_log.txt
-          chown -R jenkins:jenkins /storage/jenkins/ &>> /storage/installation_log.txt
-          chown -R jenkins:jenkins /var/cache/jenkins/ &>> /storage/installation_log.txt
-          chmod 700 /storage/jenkins/ &>> /storage/installation_log.txt
-
-          aws s3 cp s3://hermes-sharedservices-data/Jenkins/jenkins_backup /storage
-          crontab /storage/jenkins_backup
-          rm /storage/jenkins_backup
-
-          service jenkins start &>> /storage/installation_log.txt
-          service jenkins restart &>> /storage/installation_log.txt
-
+          apt-get update
+          apt-get install nginx -y
+          apt-get install openjdk-7-jdk -y
+          wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key | sudo
+          sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources
+          apt-get update
+          apt-get install jenkins -y
 
 
